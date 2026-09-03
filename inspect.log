@@ -1,0 +1,26 @@
+/Users/eleven_j/projects/fullstack-journey
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	inspect.log
+
+nothing added to commit but untracked files present (use "git add" to track)
+total 24
+drwxr-xr-x   7 eleven_j  staff  224  9月  3 16:58 .
+drwxr-xr-x   4 eleven_j  staff  128  9月  1 20:15 ..
+drwxr-xr-x  13 eleven_j  staff  416  9月  3 17:00 .git
+-rw-r--r--   1 eleven_j  staff  278  9月  3 17:00 inspect.log
+-rw-r--r--   1 eleven_j  staff   73  9月  1 20:10 notes.md
+-rw-r--r--   1 eleven_j  staff   19  9月  1 20:06 README.md
+drwxr-xr-x   3 eleven_j  staff   96  9月  2 15:45 scripts
+44cfcfb FS-003 跑一次脚本测试
+5f00371 第一天记录：Git的一些命令
+e375af1 Initial commit
+Filesystem        Size    Used   Avail Capacity iused ifree %iused  Mounted on
+/dev/disk3s1s1   460Gi    17Gi    37Gi    32%    453k  384M    0%   /
+devfs            199Ki   199Ki     0Bi   100%     688     0  100%   /dev
+/dev/disk3s6     460Gi   4.0Gi    37Gi    10%       4  384M    0%   /System/Volumes/VM
+/dev/disk3s2     460Gi    16Gi    37Gi    31%    2.0k  384M    0%   /System/Volumes/Preboot
+176K	.
