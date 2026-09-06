@@ -2,7 +2,7 @@
 set -euo pipefail
 
 usage() {
-  echo "Usage: $0 <url>" >&2
+  echo "Usage: $0 <url> [超时秒数]" >&2
   echo "Checks a URL with curl and reports OK or DOWN." >&2
 }
 
@@ -34,7 +34,7 @@ case "$code" in
     exit 0
     ;;
   *)
-    echo -e "$(date '+%F %T')\nDOWN: $url"
+    echo -e "$(date '+%T %F')\nDOWN: $url"
     exit 1
     ;;
 esac
