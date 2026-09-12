@@ -25,11 +25,11 @@ code="$(curl -s -L -o /dev/null -w '%{http_code}' --max-time "$timeout" "$url")"
 #fi
 
 case "$code" in
-  2**)
+  2*)
     echo -e "$(date '+%T %F')\nOK: $url"
     exit 0
     ;;
-  3**)
+  3*)
     echo -e "$(date '+%T %F')\nOK: $url"
     exit 0
     ;;
