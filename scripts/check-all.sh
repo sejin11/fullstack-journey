@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
   set -euo pipefail
+  
+  here="$(dirname "$0")"
 
   if [ -z "${1:-}" ]; then
     file="sites.txt"
@@ -10,16 +12,16 @@
   if [ -f "$file" ]; then
     ok=0
     down=0
-    > down.log
+    > "$here/down.log"
     while IFS= read -r line; do
       case "$line" in ""|\#*)
         continue;;
       esac
-      if ./scripts/check.sh "$line"; then
+      if "$here/check.sh" "$line"; then
         ok=$((ok+1))
       else
         down=$((down+1))
-        echo "$line" >> down.log
+        echo "$line" >> "$here/down.log"
       fi
     done < "$file"
   else
@@ -32,6 +34,6 @@
     echo "全部地址检测成功"
     exit 0
   else
-    echo "存在部分或全部失败，详情请看 $PWD/down.log"
+    echo "存在部分或全部失败，详情请看 $here/down.log"
     exit 1
   fi
