@@ -30,3 +30,37 @@ sort -u #进行排序和去重复，和sort | uniq 基本一样
 里面的主要内容就是CURL提取，刚刚输入URL的值，然后再取他的响应代码，最后把这个响应代码的值赋予给CODE，如果5秒还没有响应的话或者链接错误没办法解析，
 那就执行后边的把000这个值赋予给DODE变量，进入函数判断判断的这个值是否等于200提取出这个值来等于200那说明是通过了，
 所以回OK以及我们当时所赋予的URL的值是用户所输入的第一个参数变量，如果不是的话，则返回和用户的参数变量，然后退出。
+
+| 用例 | 输入 | 期望 | 实际 | 通过? |
+|---|---|---|---|---|
+|写内容|printf 内容追加到 /tmp.txt/ | 屏幕无返回|报错zsh: read-only file system: /tmp.txt| 因为路径写错了，导致错误|
+|写内容|printf 内容追加到 /tmp.txt/ | 屏幕无返回|通过｜｜
+|逐行读文件|while IFS= read -r line; do...done | 输出读到1、读到b| 输出正确｜｜
+|模式分支|for...in...; do...done和case...in...esac|输出跳过[]注释和处理example.com|||
+|计数器|n=0 n=$((n+1)) n=$((n+1)) echo "n=$n"| n=2 | n=2 || 
+|追加和清空|> /tmp/d.log echo 第一条 >> /tmp/d.log echo 第二条 >> /tmp/d.log cat /tmp/d.log|输出第一条和第二条 两个提示|eleven_j@MacBook-Pro-2 fullstack-journey % > /tmp/d.log
+echo first >> /tmp/d.log
+echo second >> /tmp/d.log
+cat /tmp/d.log
+^C
+eleven_j@MacBook-Pro-2 fullstack-journey % cat /tmp/d.log
+echo first >> /tmp/d.log
+echo second >> /tmp/d.log
+cat /tmp/d.log|因为是zsh充当解释器的原因，导致只有重定向（是吧？）| 
+|追加和清空|bash > /tmp/d.log echo 第一条 >> /tmp/d.log echo 第二条 >> /tmp/d.log exit cat /tmp/d.log | 出现第一条、题二条| 通过 || 
+|退出码判断|eleven_j@MacBookPro fullstack-journey % if ./scripts/check.sh https://example.com >/dev/null; then
+then> echo "成功分支" 
+then> else
+else> echo "失败分支"
+else> fi | 输出成功分支 | 成功分支 || 
+|退出码测试|eleven_j@MacBookPro fullstack-journey % bash -c 'if [ ! -f 不存在的文件.txt ]; then
+echo "文件不存在";
+exit 2;
+fi'; echo "退出码：$?"|文件不存在 退出码2|eleven_j@MacBookPro fullstack-journey % bash -c 'if [ ! -f 不存在的文件.txt ]; then
+echo "文件不存在";
+exit 2;
+fi'; echo "退出码：$?"|| 
+|参数的默认值|printf ' file="${1:-sites.txt}"\necho "$file"\n' > /tmp/t3.sh |bash /tmp/t3.sh bash /tmp/t3.sh mysites.txt| 没有参数默认用sites,有参数用参数|| 
+|||||| 
+|||||| 
+|||||| 
