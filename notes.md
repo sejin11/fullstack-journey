@@ -78,3 +78,8 @@ for> done|a.sh → 直接运行 / b.envsh → 用 source 方式执行 / c.txt �
 |把参数原样传下去|printf '#!/usr/bin/env bash\necho "脚本名：$0"\necho "参数个数：$#"\nfor a in "$@"; do echo "参数：$a"; done\n' > /tmp/args.sh bash /tmp/args.sh one "two three"|脚本名: /tmp/args.sh / 参数个数: 2 / 参数: one / 参数: two three(引号让 "two three" 算作一个参数)|||
 ||||||
 ||||||
+BASH-3 nginx entrypoint test
+1.看到了目录为空开始配置、执行脚本的输出、配置完成和最后exec的报错，一共是4行内容
+2.因为这个最后要启动nginx服务，我们的项目是没有安装的，自然不会启动然后会报错。但如果不是报错这个，脚本是走不到这里的，会在之前的某个位置停下，比如没有加权脚本的忽略或者脚本错误或者没有脚本，目录为空直接会跳过配置。
+3.中间的部分报告是忽略了这个文件。对应case "$f" in ...esac这个构件中的第三个匹配规则命中，然后返回忽略文件。
+
