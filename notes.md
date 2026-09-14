@@ -61,6 +61,20 @@ echo "文件不存在";
 exit 2;
 fi'; echo "退出码：$?"|| 
 |参数的默认值|printf ' file="${1:-sites.txt}"\necho "$file"\n' > /tmp/t3.sh |bash /tmp/t3.sh bash /tmp/t3.sh mysites.txt| 没有参数默认用sites,有参数用参数|| 
-|||||| 
-|||||| 
-|||||| 
+|---|---|---|---|---| 
+|case的多种模式|for f in "a.sh" "b.envsh" "c.txt"; do
+for> case "$f" in
+for case> *.envsh) echo "$f ---用source方式执行";;
+for case> *.sh) echo "$f ---直接运行";;
+for case> *) echo "$f ---忽略";;
+for case> esac
+for> done|a.sh → 直接运行 / b.envsh → 用 source 方式执行 / c.txt → 忽略| 按分类标准正常输出|| 
+|source和新进程|printf 'export GREETING="你好"\necho "执行我的进行 是：$0"\n' > /tmp/env.sh|无输出|无输出|| 
+|source和新进程|bash /tmp/env.sh; echo "新进程之后 GREETING=[${GREETING:-空}]"  |执行我的进行是：/tmp/env.sh 新进程之后 GREETING=[空]|输出为空||
+|source和新进程|source /tmp/env.sh; echo "source 之后 GREETING=[$GREETING]"|执行我的进程是：/tmp/env.sh source 之后 GREETING=[你好]|输出你好||
+|批量处理文件|mkdir -p /tmp/fd && touch /tmp/fd/a.sh /tmp/fd/b.txt /tmp/fd/c.sh find /tmp/fd -type f -name '*.sh' | sort | while read -r f; do echo "找到脚本: $f"; done |找到脚本a.sh c.sh|显示正常||
+|字典顺序和版本顺序|"printf "10\n2\n1\n" | sort printf "10\n2\n1\n" | sort -V"|1 10 2\1 2 10|显示正确||
+|进程顶替|bash -c 'echo 第一句; exec echo 我被顶替了; echo 这句永远不会执行'|第一句 / 我被顶替了——第三句不打印|第三句话没有打印||
+|把参数原样传下去|printf '#!/usr/bin/env bash\necho "脚本名：$0"\necho "参数个数：$#"\nfor a in "$@"; do echo "参数：$a"; done\n' > /tmp/args.sh bash /tmp/args.sh one "two three"|脚本名: /tmp/args.sh / 参数个数: 2 / 参数: one / 参数: two three(引号让 "two three" 算作一个参数)|||
+||||||
+||||||
