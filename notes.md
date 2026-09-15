@@ -76,10 +76,38 @@ for> done|a.sh → 直接运行 / b.envsh → 用 source 方式执行 / c.txt �
 |字典顺序和版本顺序|"printf "10\n2\n1\n" | sort printf "10\n2\n1\n" | sort -V"|1 10 2\1 2 10|显示正确||
 |进程顶替|bash -c 'echo 第一句; exec echo 我被顶替了; echo 这句永远不会执行'|第一句 / 我被顶替了——第三句不打印|第三句话没有打印||
 |把参数原样传下去|printf '#!/usr/bin/env bash\necho "脚本名：$0"\necho "参数个数：$#"\nfor a in "$@"; do echo "参数：$a"; done\n' > /tmp/args.sh bash /tmp/args.sh one "two three"|脚本名: /tmp/args.sh / 参数个数: 2 / 参数: one / 参数: two three(引号让 "two three" 算作一个参数)|||
-||||||
-||||||
+|---|---|---|---|---|
 BASH-3 nginx entrypoint test
 1.看到了目录为空开始配置、执行脚本的输出、配置完成和最后exec的报错，一共是4行内容
 2.因为这个最后要启动nginx服务，我们的项目是没有安装的，自然不会启动然后会报错。但如果不是报错这个，脚本是走不到这里的，会在之前的某个位置停下，比如没有加权脚本的忽略或者脚本错误或者没有脚本，目录为空直接会跳过配置。
 3.中间的部分报告是忽略了这个文件。对应case "$f" in ...esac这个构件中的第三个匹配规则命中，然后返回忽略文件。
+|---|---|---|---|---|
+独立解剖备份脚本
+1.做备份和清理备份的；入口在if ! tar --create --gzip --file="$bdir$filename" "${srcdir}" 2>/dev/null; then这句话开始备份，前面主要是校验以及定义变量；if ...; then fi | find ... -name "" .....等，主要是if语法 
+2.失效应该是这个部分
+  find "$bdir" -name "${bname}*" -type f -printf "${bdir}%P\n" | sort | head -n -"$bnum" | sed "s/.*/\"&\"/" | xargs rm -f
+其中的 -N识别错误（LLM告诉我的，要不我也不会...），搞不了负数，所以失败。但是这个失败是if判断完之后的，判断完是大于0的参数，退出码是0，他就执行了then，但是then内又失败了，应该就是你说的静默失败了。
+下面的部分在LLM的解释和帮助下，测试完最后增加了一些自己的理解，然后改为了这个
+find "$bdir" -name "${bname}*" -type f | sort > all.txt
+total=$(wc -l < all.txt)
 
+if [ "$bnum" -gt 0 ]; then
+    keep=$((total - bnum))
+    if [ "$keep" -gt 0 ]; then
+        head -n "$keep" < all.txt | sed 's#.*#"&"#' | xargs rm -f
+    fi
+else
+    read -r -p "现在的操作会删除现存的共 $total 个备份，请再次确认是否要执行（默认为取消）[y/n]" ans
+    echo "你的输入是：[$ans]"
+    case "$ans" in
+        y|Y) echo "执行全部删除"
+        find "$bdir" -name "${bname}*" -type f -delete ;;
+        *) echo "删除操作取消" ;
+    esac
+fi
+
+3.因为退出码看是最后的xargs rm -f这个，前面错了他没错，他没错退出0，if看到就0就走完了，然后在退出0
+意味着发现不了问题吧，corn看到的是你正常的说明，然后实际没有执行好清理旧的备份，然后越堆越多。
+4.参数1改为/之后我觉得会在这一部分出问题
+bname=$(echo "${1}" | sed -r 's#/#-#g' | sed 's#^-##')
+因为管道第一步输入/，第一个sed把他改为了-，然后第二个sed给他删掉了，就说明都没有了，这个变量变成了空，然后在下面的if里会走到退出4。
