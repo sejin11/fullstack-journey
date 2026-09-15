@@ -32,13 +32,13 @@ if ! tar --create --gzip --file="$bdir$filename" "${srcdir}" 2>/dev/null; then
     exit 4
 fi
 
-find "$bdir" -name "${bname}*" -type f | sort > all.txt
-total=$(wc -l < all.txt)
+find "$bdir" -name "${bname}*" -type f | sort > "$bdir/all.txt"
+total=$(wc -l < "$bdir/all.txt")
 
 if [ "$bnum" -gt 0 ]; then
     keep=$((total - bnum))
     if [ "$keep" -gt 0 ]; then
-        head -n "$keep" < all.txt | sed 's#.*#"&"#' | xargs rm -f
+        head -n "$keep" < "$bdir/all.txt" | sed 's#.*#"&"#' | xargs rm -f
     fi  
 else
     read -r -p "现在的操作会删除现存的共 $total 个备份，请再次确认是否要执行（默认为取消）[y/n]" ans     

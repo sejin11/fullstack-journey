@@ -88,13 +88,13 @@ BASH-3 nginx entrypoint test
   find "$bdir" -name "${bname}*" -type f -printf "${bdir}%P\n" | sort | head -n -"$bnum" | sed "s/.*/\"&\"/" | xargs rm -f
 其中的 -N识别错误（LLM告诉我的，要不我也不会...），搞不了负数，所以失败。但是这个失败是if判断完之后的，判断完是大于0的参数，退出码是0，他就执行了then，但是then内又失败了，应该就是你说的静默失败了。
 下面的部分在LLM的解释和帮助下，测试完最后增加了一些自己的理解，然后改为了这个
-find "$bdir" -name "${bname}*" -type f | sort > all.txt
-total=$(wc -l < all.txt)
+find "$bdir" -name "${bname}*" -type f | sort > "$bdir/all.txt"
+total=$(wc -l < "$bdir/all.txt")
 
 if [ "$bnum" -gt 0 ]; then
     keep=$((total - bnum))
     if [ "$keep" -gt 0 ]; then
-        head -n "$keep" < all.txt | sed 's#.*#"&"#' | xargs rm -f
+        head -n "$keep" < "$bdir/all.txt" | sed 's#.*#"&"#' | xargs rm -f
     fi
 else
     read -r -p "现在的操作会删除现存的共 $total 个备份，请再次确认是否要执行（默认为取消）[y/n]" ans
@@ -110,4 +110,4 @@ fi
 意味着发现不了问题吧，corn看到的是你正常的说明，然后实际没有执行好清理旧的备份，然后越堆越多。
 4.参数1改为/之后我觉得会在这一部分出问题
 bname=$(echo "${1}" | sed -r 's#/#-#g' | sed 's#^-##')
-因为管道第一步输入/，第一个sed把他改为了-，然后第二个sed给他删掉了，就说明都没有了，这个变量变成了空，然后在下面的if里会走到退出4。
+因为管道第一步输入/，第一个sed把他改为了-，然后第二个sed给他删掉了，就说明都没有了，这个变量变成了空，然后在下面的查找中会变成"*"匹配了备份目录的所有文件，不能精确控制我们要删除的范围了，如果还有别的备份文件，也会被误删除。
