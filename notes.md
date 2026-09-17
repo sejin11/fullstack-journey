@@ -111,3 +111,18 @@ fi
 4.参数1改为/之后我觉得会在这一部分出问题
 bname=$(echo "${1}" | sed -r 's#/#-#g' | sed 's#^-##')
 因为管道第一步输入/，第一个sed把他改为了-，然后第二个sed给他删掉了，就说明都没有了，这个变量变成了空，然后在下面的查找中会变成"*"匹配了备份目录的所有文件，不能精确控制我们要删除的范围了，如果还有别的备份文件，也会被误删除。
+|---|---|---|---|---|
+FS-008课程笔记
+主线任务A：完成。之前就安装过，然后升级brew update升级到最新版本7.0.2。
+我的node不用brew安装，因为不能方便的进行版本控制。所以使用了nvm来安装
+eleven_j@MacBookPro node-playground % node -v
+v24.15.0
+eleven_j@MacBookPro node-playground % which node
+/Users/eleven_j/.nvm/versions/node/v24.15.0/bin/node
+
+主线任务B：创建了项目、写了gitignore、加了暂存、已经提交，但是没有push到远端
+npm run cow有正常的输出
+git status看不到模块
+eleven_j@MacBookPro node-playground % git log --oneline
+cd4d5b8 (HEAD -> main) FS-008:第一个npm项目（scripts/.gitignore/重建实验）
+eleven_j@MacBookPro node-playground % 
