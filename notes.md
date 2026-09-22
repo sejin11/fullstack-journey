@@ -22,6 +22,7 @@ sort -u #进行排序和去重复，和sort | uniq 基本一样
 
 演练1和演练2都已经做完了。
 
+
 这个检查脚本的内容大概是首先有一个执行的地方供内核去看，当然这个是你执行的操作，如果是你直接bash执行，那他就不看这一行。
 下边的第是设置一个安全边界，把有错误的地方让他及时停止，这样刚才发现问题。然后接下来的就是定一个用法函数用法函数里边的主要内容是用法，
 然后写这个脚本的名称以及输入它的链接地址，告诉他怎么去用后下边第二行输入检查你的链接地址去接，看他返回是OK还是进入到正文的判断部分，
@@ -125,4 +126,90 @@ npm run cow有正常的输出
 git status看不到模块
 eleven_j@MacBookPro node-playground % git log --oneline
 cd4d5b8 (HEAD -> main) FS-008:第一个npm项目（scripts/.gitignore/重建实验）
-eleven_j@MacBookPro node-playground % 
+eleven_j@MacBookPro node-playground %
+
+|---|---|---|---|---|
+FS-009笔记
+
+1.已经生成，但是一开始生产的.js用的是之前的require导入模块我看不懂，因为没有学习这个，所以重新写了.mjs的用import来导入了“fs”这个模块。
+
+2.跑了项目根目录下的sites.txt输出如下：
+node scripts/check-js.mjs sites.txt                                                  ─╯
+DOWN: google.com
+DOWN: baidu.com
+DOWN: purehikegear.com
+DOWN: purehikegear.cn
+DOWN: youtube.com
+DOWN: a.b
+DOWN: b.c
+DOWN: instgram.com
+OK: https://example.com
+OK: https://baidu.com
+DOWN: https://this-site-does-not-exist-abc.invalid
+共 11 个:OK 2,DOWN 9
+
+其中的OK数量不对或者除网络原因外本来应该OK的没有返回OK值，应该是fetch与curl不同的原因。
+
+3.
+#!/usr/bin/env node   //告诉内核用node来执行脚本
+
+import fs from "node:fs";  //从node内置的模块中导入"fs"这个模块
+
+const file = process.argv[2] ?? "sites.txt";  //设置变量file，然后给其赋值（调用程序的参数功能检查是否有输入第一个参数，如果有就把这个参数赋值给变量file，否则使用默认的sites.txt）
+
+let content;  //设置一个可变的变量content，让后面的内容来赋值
+/*使用一个保险来执行可能出错的代码，让程序在出错时不至于崩溃直接退出，让其可以执行后面的代码。把刚刚的file变量单作一个参数然后调用fs内部的功能去检查文件内容，把检查的内容结果赋值给content这个变量。如果出错了，就走后面的两个error来错报，然后退出码为2。*/
+try {
+  content = fs.readFileSync(file, "utf8");
+} catch (err) {
+  console.error(`错误：读不到文件 ${file}`);
+  console.error(`原因：${err.code}`);
+  process.exit(2);
+}
+
+const lines = content.split("\n");  //设置一个lines的变量，用之前的没有问题的content内容来分成行的形似
+
+const urls = [];  //设置一个urls的变量，但是这个变量时数组的形式，内容后面再填
+for (const raw of lines) {  //设置一个循环。循环的内容是从lines里拿行出来，然后下面在调用数据的裁剪功能把前后空白部分裁剪掉赋值给line单个行的变量，然后执行下面的判断说这个line如果是空白和以#开头的就跳过，然后找到真正的链接放在urls这个数组里。
+  const line = raw.trim();            
+  if (line === "") continue;          
+  if (line.startsWith("#")) continue; 
+  urls.push(line);                    
+}
+//调用一个异步函数checkOne,输入的参数是url这个标签。也是在保险里执行代码，设置一个res的变量，内容是异步函数，然后这个函数取回网页的内容清单来，await用清单等待拿回对象，如果超过5秒就放弃，然后返回res的状态码得是200-400的左闭右开的一个返回码区间，如果中间代码出错了就掉catch来返回失败。
+async function checkOne(url) {
+  try {
+    const res = await fetch(url, {
+      signal: AbortSignal.timeout(5000),
+    });
+    return res.status >= 200 && res.status < 400;
+  } catch (err) {
+    return false;
+  }
+}
+//这个部分是主函数内容。先设置两个可变变量ok和down,然后执行循环，循环的内容是在urls这个数组里取参数叫做url的标签，然后调用刚刚的checkOne函数和url的参数来执行，结果赋值给alive这个变量，如果alive返回值为0就打印ok:$url,然后OK的数量就加一，否则返回down:url，然后DOWN的数量加一。
+async function main() {
+  let ok = 0;
+  let down = 0;
+
+  for (const url of urls) {
+    const alive = await checkOne(url);
+    if (alive) {
+      console.log(`OK: ${url}`);
+      ok++;
+    } else {
+      console.log(`DOWN: ${url}`);
+      down++;
+    }
+  }
+//循环完了之后设置一个统计变量total，用OK和down的数值来最终赋值，并打印相应的数量。
+  const total = ok + down;
+  console.log(`共 ${total} 个:OK ${ok},DOWN ${down}`);
+//最后给出一个结果，如果全部是OK，那退出码就是0，否则就是1，让别人或者程序知道有不通的网址，也许需要进一步的检查。
+  process.exit(ok === total ? 0 : 1);
+}
+//真正执行主函数
+main();
+
+4.我感觉和之前的版本相比之前好像读起来会更容易些，但是现在这个版本它的逻辑性要更强一些，代码更简洁，所以可能是如果比较熟悉读这个速度会更快。之前的注释是加#，现在是//或者/*...*/;超时之前是设置-timeout，现在是也差不多吧，调用的东西不一样。
+
