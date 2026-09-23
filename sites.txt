@@ -1,13 +1,13 @@
 #链接测试文本集合
 
-google.com
-baidu.com
-purehikegear.com
-purehikegear.cn
-youtube.com
+https://www.google.com
+https://www.baidu.com
+https://purehikegear.com
+https://purehikegear.cn
+https://www.youtube.com
 a.b
 b.c
-instgram.com
+https://www.instgram.com
 # 我的监控清单
 
 https://example.com

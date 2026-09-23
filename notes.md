@@ -148,7 +148,7 @@ OK: https://baidu.com
 DOWN: https://this-site-does-not-exist-abc.invalid
 共 11 个:OK 2,DOWN 9
 
-其中的OK数量不对或者除网络原因外本来应该OK的没有返回OK值，应该是fetch与curl不同的原因。
+其中的OK数量不对或者除网络原因外本来应该OK的没有返回OK值，应该是fetch需要的是完整的地址，不加https://有的没用补全就取不回来了。
 
 3.
 #!/usr/bin/env node   //告诉内核用node来执行脚本
@@ -187,7 +187,7 @@ async function checkOne(url) {
     return false;
   }
 }
-//这个部分是主函数内容。先设置两个可变变量ok和down,然后执行循环，循环的内容是在urls这个数组里取参数叫做url的标签，然后调用刚刚的checkOne函数和url的参数来执行，结果赋值给alive这个变量，如果alive返回值为0就打印ok:$url,然后OK的数量就加一，否则返回down:url，然后DOWN的数量加一。
+//这个部分是主函数内容。先设置两个可变变量ok和down,然后执行循环，循环的内容是在urls这个数组里取参数叫做url的标签，然后调用刚刚的checkOne函数和url的参数来执行，结果赋值给alive这个变量，如果alive返回值为TURE就打印ok:$url,然后OK的数量就加一，否则返回down:url，然后DOWN的数量加一。
 async function main() {
   let ok = 0;
   let down = 0;
@@ -213,3 +213,31 @@ main();
 
 4.我感觉和之前的版本相比之前好像读起来会更容易些，但是现在这个版本它的逻辑性要更强一些，代码更简洁，所以可能是如果比较熟悉读这个速度会更快。之前的注释是加#，现在是//或者/*...*/;超时之前是设置-timeout，现在是也差不多吧，调用的东西不一样。
 
+挑战题
+
+看check-js-conc.mjs这个文件
+
+内化检测点
+1.const a = [1, 2, 3 ];
+  function const add = (b,c) => b + c;
+return在箭头函数里函数体加了花括号的话需要加上，如果没有加会返回return，但是一般还是直接不加花括号和return，更简单一些。
+
+2.const list = ["a", "b", "c"];
+  for (const l of list) {
+    console.log("Print:"l);
+}
+(查找资料后：of拿到的是值，in拿到的是下标序号)
+
+3.const obj = {1:a ,2:b, 3:c };
+console.log(obj.1);
+console.log(obj["2"])
+
+4.===强制相等，==有些string和数字他也会判断相等，不严谨
+
+5.await用清单等待拿回对象。没有await的话就只有一个清单，没有具体的结果信息
+
+6.两个反常识的点你已经说了，不同点我理解的是curl功能更强用法更多。
+
+7.mjs可以用新的import来导入模块，js不行，需要用之前的require来导入。source会弄一个新的进程来运行，但是mjs和js不需要，就在里面就导入了，以及source的文件相对地址是相对CWD来的，MJS是文件本来的位置，更合理一些，坑更少一些。
+
+8.我认为切开然后打印出来错误信息会更好排错。
