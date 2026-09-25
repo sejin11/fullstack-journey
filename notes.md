@@ -72,7 +72,7 @@ for case> esac
 for> done|a.sh → 直接运行 / b.envsh → 用 source 方式执行 / c.txt → 忽略| 按分类标准正常输出|| 
 |source和新进程|printf 'export GREETING="你好"\necho "执行我的进行 是：$0"\n' > /tmp/env.sh|无输出|无输出|| 
 |source和新进程|bash /tmp/env.sh; echo "新进程之后 GREETING=[${GREETING:-空}]"  |执行我的进行是：/tmp/env.sh 新进程之后 GREETING=[空]|输出为空||
-|source和新进程|source /tmp/env.sh; echo "source 之后 GREETING=[$GREETING]"|执行我的进程是：/tmp/env.sh source 之后 GREETING=[你好]|输出你好||
+|source和新进程|ource /tmp/env.sh; echo "source 之后 GREETING=[$GREETING]"|执行我的进程是：/tmp/env.sh source 之后 GREETING=[你好]|输出你好||
 |批量处理文件|mkdir -p /tmp/fd && touch /tmp/fd/a.sh /tmp/fd/b.txt /tmp/fd/c.sh find /tmp/fd -type f -name '*.sh' | sort | while read -r f; do echo "找到脚本: $f"; done |找到脚本a.sh c.sh|显示正常||
 |字典顺序和版本顺序|"printf "10\n2\n1\n" | sort printf "10\n2\n1\n" | sort -V"|1 10 2\1 2 10|显示正确||
 |进程顶替|bash -c 'echo 第一句; exec echo 我被顶替了; echo 这句永远不会执行'|第一句 / 我被顶替了——第三句不打印|第三句话没有打印||
@@ -187,7 +187,7 @@ async function checkOne(url) {
     return false;
   }
 }
-//这个部分是主函数内容。先设置两个可变变量ok和down,然后执行循环，循环的内容是在urls这个数组里取参数叫做url的标签，然后调用刚刚的checkOne函数和url的参数来执行，结果赋值给alive这个变量，如果alive返回值为TURE就打印ok:$url,然后OK的数量就加一，否则返回down:url，然后DOWN的数量加一。
+//这个部分是主函数内容。先设置两个可变变量ok和down,然后执行循环，循环的内容是在urls这个数组里取参数叫做url的标签，然后调用刚刚的checkOne函数和url的参数来执行，结果赋值给alive这个变量，如果alive返回值为ture就打印ok:$url,然后OK的数量就加一，否则返回down:url，然后DOWN的数量加一。
 async function main() {
   let ok = 0;
   let down = 0;
@@ -228,8 +228,8 @@ return在箭头函数里函数体加了花括号的话需要加上，如果没�
 }
 (查找资料后：of拿到的是值，in拿到的是下标序号)
 
-3.const obj = {1:a ,2:b, 3:c };
-console.log(obj.1);
+3.const obj = {1:"a" ,2:"b", 3:"c" };
+console.log(obj.[1]);
 console.log(obj["2"])
 
 4.===强制相等，==有些string和数字他也会判断相等，不严谨
@@ -238,6 +238,360 @@ console.log(obj["2"])
 
 6.两个反常识的点你已经说了，不同点我理解的是curl功能更强用法更多。
 
-7.mjs可以用新的import来导入模块，js不行，需要用之前的require来导入。source会弄一个新的进程来运行，但是mjs和js不需要，就在里面就导入了，以及source的文件相对地址是相对CWD来的，MJS是文件本来的位置，更合理一些，坑更少一些。
+7.mjs可以用新的import来导入模块，js不行，需要用之前的require来导入。source的文件相对地址是相对CWD来的，MJS是文件本来的位置，更合理一些，坑更少一些。
 
 8.我认为切开然后打印出来错误信息会更好排错。
+
+
+FS-009 内化练习:从"读过"到"写得出"
+第一部分
+1.预测输出应该是a 3，第一个是打印第一个数组的内容，然后是打印数组个数
+╭─  ~/projects/fullstack-journey   main !1                                           ─╮
+╰─❯ node /tmp/drill-6.js                                                                 ─╯
+a 3
+
+2.输出预测是8 undefined，因为第二个箭头函数加了花括号但是没写return没东西接住他的内容
+╭─  ~/projects/fullstack-journey   main !1                                           ─╮
+╰─❯ node /tmp/drill-6.js                                                                 ─╯
+8 undefined
+(又预测对了嘻嘻)
+
+3.预测输出是https://examle.com 200
+╭─  ~/projects/fullstack-journey   main !1                                           ─╮
+╰─❯ node /tmp/drill-6.js                                                                 ─╯
+https://example.com 200 undefined
+(少了一个undefined的返回，我以为是一个默认的方式来着，现在看来是一个没有被定义的键)
+
+4.预测输出第一个不相等第二个相等。第一个数字和字符不相等，第二个则没有那么严格。
+╭─  ~/projects/fullstack-journey   main !1                                           ─╮
+╰─❯ node /tmp/drill-6.js                                                                 ─╯
+false
+true
+(返回值是布尔值！刚刚没想到呢，不过逻辑是对了的)
+
+5.预测返回
+共 ${n} 个
+共1个
+╭─  ~/projects/fullstack-journey   main !1                                           ─╮
+╰─❯ node /tmp/drill-6.js                                                                 ─╯
+共 ${n} 个
+共 3 个
+(逻辑基本对了，但是这里调用的是变量本身，我错理解成了个数了)
+
+6.预测输出
+of:x 
+of:y 
+in:0
+in:1 
+╭─  ~/projects/fullstack-journey   main !1                                           ─╮
+╰─❯ node /tmp/drill-6.js                                                                 ─╯
+of: x
+of: y
+in: 0
+in: 1
+
+第二部分
+A:
+const file = process.argv[2] ?? "sites.txt";
+console.log(file);
+
+B:
+const results = [
+  { url: "a", status: "ok" },
+  { url: "b", status: "down" },
+  { url: "c", status: "ok" },
+];
+const ok = results.filter((r) => r.status === "ok").length;
+console.log(`OK ${ok},DOWN ${results.length - ok}`);
+
+C:
+import fs from "node:fs";
+try {
+  const content = fs.readFileSync("/tmp/drill2c.txt", "utf8");
+  console.log("读到", content.split("\n").length, "行");
+} catch (err) {
+  console.error(`读不到文件:${err.code}`);
+  process.exit(2);
+}
+
+第三部分
+1.我在检查部分增加了    
+console.log(err.message);
+console.log(err.cause);
+但是测试输出的down中并没有返回原因。
+1.1调整了一下顺序，先输出内容再返回false，应该是可以了。推测应该是输出到false之后就不执行后面的catch里的内容了，为什么呢？
+输出内容
+╭─  ~/projects/fullstack-journey   main !2                                           ─╮
+╰─❯ node scripts/check-js.js                                                             ─╯
+The operation was aborted due to timeout
+undefined
+DOWN: https://www.google.com
+OK: https://www.baidu.com
+OK: https://purehikegear.com
+OK: https://purehikegear.cn
+The operation was aborted due to timeout
+undefined
+DOWN: https://www.youtube.com
+Failed to parse URL from a.b
+TypeError: Invalid URL
+    at new URL (node:internal/url:819:25)
+    at new Request (node:internal/deps/undici/undici:11832:25)
+    at fetch (node:internal/deps/undici/undici:12757:25)
+    at fetch (node:internal/deps/undici/undici:17407:10)
+    at fetch (node:internal/bootstrap/web/exposed-window-or-worker:83:12)
+    at checkOne (/Users/eleven_j/projects/fullstack-journey/scripts/check-js.js:45:23)
+    at main (/Users/eleven_j/projects/fullstack-journey/scripts/check-js.js:66:25) {
+  code: 'ERR_INVALID_URL',
+  input: 'a.b'
+}
+DOWN: a.b
+Failed to parse URL from b.c
+TypeError: Invalid URL
+    at new URL (node:internal/url:819:25)
+    at new Request (node:internal/deps/undici/undici:11832:25)
+    at fetch (node:internal/deps/undici/undici:12757:25)
+    at fetch (node:internal/deps/undici/undici:17407:10)
+    at fetch (node:internal/bootstrap/web/exposed-window-or-worker:83:12)
+    at checkOne (/Users/eleven_j/projects/fullstack-journey/scripts/check-js.js:45:23)
+    at main (/Users/eleven_j/projects/fullstack-journey/scripts/check-js.js:66:25) {
+  code: 'ERR_INVALID_URL',
+  input: 'b.c'
+}
+DOWN: b.c
+The operation was aborted due to timeout
+undefined
+DOWN: https://www.instgram.com
+OK: https://example.com
+OK: https://baidu.com
+fetch failed
+Error: getaddrinfo ENOTFOUND this-site-does-not-exist-abc.invalid
+    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'this-site-does-not-exist-abc.invalid'
+}
+DOWN: https://this-site-does-not-exist-abc.invalid
+共 11 个:OK 5,DOWN 6
+
+2.兜底这个部分在筛选链接的时候尝试加了下面的判断语句
+const urls = [];
+for (const raw of lines) {
+  const line = raw.trim();            // 去掉首尾空白（含 Windows 的 \r）
+  if (line === "") continue;          // 空行 → 跳过
+  if (line.startsWith("#")) continue;
+  if (!line.startsWith("http://" || "https://")) {
+    const linef = `https://${line}`;
+  };
+  urls.push(line);
+  urls.push(linef);// 剩下的才算网址
+}
+但是运行报错。
+╭─  ~/projects/fullstack-journey   main !3                                           ─╮
+╰─❯ node scripts/check-js.js                                                             ─╯
+/Users/eleven_j/projects/fullstack-journey/scripts/check-js.js:42
+  urls.push(linef);// 剩下的才算网址
+            ^
+
+ReferenceError: linef is not defined
+    at Object.<anonymous> (/Users/eleven_j/projects/fullstack-journey/scripts/check-js.js:42:13)
+    at Module._compile (node:internal/modules/cjs/loader:1830:14)
+    at Object..js (node:internal/modules/cjs/loader:1961:10)
+    at Module.load (node:internal/modules/cjs/loader:1553:32)
+    at Module._load (node:internal/modules/cjs/loader:1355:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47
+
+Node.js v24.15.0
+
+说是linef这个变量没有定义，我放在循环里的，不是很清楚为什么这样不行。接下来要去询问LLM看看原因。
+得到的结果是花括号内的变量传不出去，需要在外面设置一个可变变量在用内部的去填充。或者直接在内部当做一个值来使用。用？来判断有没有头，有就用line没有就用加了头的新的变量。有点类似于之前的BASH判断是否有参数输入，没有就用默认指定的某个参数。
+除此之外还有一些用法错误比如||要用在外面，内部会被先进行运算，不能达到我们的要求。
+修改后还是不太行。可变变量会残留上次的值，导致数据出问题。
+const urls = [];
+let linef;
+for (const raw of lines) {
+  const line = raw.trim();            // 去掉首尾空白（含 Windows 的 \r）
+  if (line === "") continue;          // 空行 → 跳过
+  if (line.startsWith("#")) continue;
+  if (!line.startsWith("http://") && !line.startsWith("https://")) {
+    const linef = `https://${line}`;
+  };
+  urls.push(line);
+  urls.push(linef);// 剩下的才算网址
+}
+还是得再次修改。
+这次不应该再修修补补了，因为收益并不大。还是换成直接判断的形式来解决。更简洁也更易读
+const urls = [];
+for (const raw of lines) {
+  const line = raw.trim();            // 去掉首尾空白（含 Windows 的 \r）
+  if (line === "") continue;          // 空行 → 跳过
+  if (line.startsWith("#")) continue;
+  const linef = line.startsWith("http://") || line.startsWith("https://")
+    ? line : `https://${line}`;
+  urls.push(linef);
+  }
+这次改为了再循环内部的值当作一个判判断，然后只留下一个值，满足条件的用原line来赋值，不满足的加一个头来重新赋值，但最终都是这个变量。
+
+3.async function checkOne(url) {
+    try {
+      const res = await fetch(url, {
+        // 5 秒还没回应就主动放弃（抛出异常，走下面的 catch）
+        signal: AbortSignal.timeout(5000),
+      });
+      // 2xx / 3xx 都算活着，和 bash 版里 case "$code" in 2*|3*) 的规则一致。
+      return res.status >= 200 && res.status < 400;  //如果是返回码早200到400之间，包括
+  200，不包括400就是正常的，返回布尔值ture，其他的状态吗就是false。这个到bash的0/1不一样，
+  那个是退出码这个是判断的结果，程序的退出码是最后的那个process来决定的，也就是提示程序或者
+  使用者是否全部成功，还是有不成功的链接。
+    } catch (err) {
+      // 超时、域名解析不了、连不上……都会落到这里，一律算 DOWN。
+      console.log(err.message);
+      console.log(err.cause);
+      return false;
+    }
+  }
+
+第四部分
+第一次写
+#!/usr/bin/env node
+
+type webstatus = "ok" | "down";
+
+interface Res {
+  status: webstatus;
+}
+
+function analyzeResults(results: Res[]) {
+  ok = 0
+  down = 0
+  for (s of results) {
+    if (s.status) === "ok" ok++ ;
+    else continue;
+    if (s.status) === "down" down++ ;
+    else {
+        console.log(`错误的信息:${s.status}`);
+      }
+    }
+  console.log(`{ok:${ok}, down:${down}}`)
+  }
+
+const input: Res[] = [
+  {status:"ok", status:"down", status:"ok", status:"BINGO"}
+];
+
+有很多错误，不列举了，继续改
+第二部分重写
+决定使用其他的方法，for循环好像不是很合适，因为还要使用try和catch来做保险
+#!/usr/bin/env node
+
+function analyzeResults(results) {
+  try{
+    const good = results.filter(res => res.status === "ok").length;
+    const bad = results.filter(res => res.status === "down").length;
+  }  catch(err) {
+    throw new Error("不认识的状态")
+    console.log(err.massage);
+  }
+  console.log(`{ok:${good}, down:${bad}}`);
+}
+
+const results = [
+    {stauts:"ok"}, {status:"down"}, {status:"ok"}, {status:"BINGO"},
+  ];
+
+analyzeResults(results);
+提示我没有定义变量
+
+把打印换到花括号内以后，能跑了，但是不对哈哈哈哈哈哈哈
+╭─  ~/projects/fullstack-journey   main !4 ?1                                        ─╮
+╰─❯ node scripts/analyze-results.js                                                      ─╯
+{ok:1, down:1}
+
+ok 应该是2才对，以及不认识的状态没报，继续改
+
+第三次写
+前一个内容有写错了的部分
+改了几次以后
+#!/usr/bin/env node
+
+function analyzeResults(results) {
+  let index = 0;
+  for (const res of results) {
+    if (res.status !=="ok" && res.status !=="down") {
+      throw new Error(`不认识的状态:${res.status}(下标${index})`)
+      console.log(err.massage);
+    }
+  index++;
+  }
+  try{
+    const good = results.filter(res => res.status === "ok").length;
+    const bad = results.filter(res => res.status === "down").length;
+    console.log(`{ok:${good}, down:${bad}}`);
+  }  catch(err) {
+    console.log(err.massage);
+  }
+}
+
+const results = [
+{status:"ok"}, {status:"down"}, {status:"ok"}, {status:"BINGO"},
+  ];
+
+analyzeResults(results);
+
+╭─  ~/projects/fullstack-journey   main !4 ?1                                        ─╮
+╰─❯ node scripts/analyze-results.js                                                      ─╯
+/Users/eleven_j/projects/fullstack-journey/scripts/analyze-results.js:7
+      throw new Error(`不认识的状态:${res.status}(下标${index})`)
+      ^
+
+Error: 不认识的状态:BINGO(下标3)
+    at analyzeResults (/Users/eleven_j/projects/fullstack-journey/scripts/analyze-results.js:7:13)
+    at Object.<anonymous> (/Users/eleven_j/projects/fullstack-journey/scripts/analyze-results.js:25:1)
+    at Module._compile (node:internal/modules/cjs/loader:1830:14)
+    at Object..js (node:internal/modules/cjs/loader:1961:10)
+    at Module.load (node:internal/modules/cjs/loader:1553:32)
+    at Module._load (node:internal/modules/cjs/loader:1355:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47
+
+Node.js v24.15.0
+没有错误状态时运行时正常的。有错误时抛出了错误。应该对了。
+
+第四次修改 
+因为返回的内容不是对象还是字符，只是我把输出做成了那个样子，但其实不是对象。
+所以应该返回也就是return一个对象
+然后在主函数里打印，这样就能在终端看到
+#!/usr/bin/env node
+
+function analyzeResults(results) {
+  let index = 0;
+  for (const res of results) {
+    if (res.status !=="ok" && res.status !=="down") {
+      throw new Error(`不认识的状态:${res.status}(下标${index})`)
+    }
+  index++;
+  }
+  try{
+    const good = results.filter(res => res.status === "ok").length;
+    const bad = results.filter(res => res.status === "down").length;
+    return {ok:good, down:bad};
+  }  catch(err) {
+    console.log(err.massage);
+  }
+}
+
+const results = [
+    {status:"ok"}, {status:"down"}, {status:"ok"}, {status:"ok"},
+  ];
+
+console.log(analyzeResults(results));
+
+
+第五部分 
+1.===强制等于，==字符和数字看起来相等时也是会判定相等，预测输出第一个不相等第二个相等
+2.等待清单上的结果，没有就只能得到一个promise清单
+3.fetch不能自动补全协议头
+4.变量在花括号内的传不出去。报错发现的。

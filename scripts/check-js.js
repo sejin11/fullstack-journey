@@ -34,10 +34,13 @@ const urls = [];
 for (const raw of lines) {
   const line = raw.trim();            // 去掉首尾空白（含 Windows 的 \r）
   if (line === "") continue;          // 空行 → 跳过
-  if (line.startsWith("#")) continue; // 注释行 → 跳过
-  urls.push(line);                    // 剩下的才算网址
-}
-
+  if (line.startsWith("#")) continue;
+  const linef = line.startsWith("http://") || line.startsWith("https://")
+    ? line
+    : `https://${line}`;  //再循环内增加一个判断，如果是满足的就用原变量来赋给新的，如果不满足就新增一个头来赋值
+  urls.push(linef);
+  }
+ 
 // ========== 5. 检查单个网址 ==========
 // async 函数 = "里面会有等待操作"；await = "在这儿等结果回来再往下走"。
 async function checkOne(url) {
@@ -47,9 +50,11 @@ async function checkOne(url) {
       signal: AbortSignal.timeout(5000),
     });
     // 2xx / 3xx 都算活着，和 bash 版里 case "$code" in 2*|3*) 的规则一致。
-    return res.status >= 200 && res.status < 400;
+    return res.status >= 200 && res.status < 400;  //如果是返回码早200到400之间，包括200，不包括400就是正常的，返回布尔值ture，其他的状态吗就是false。这个到bash的0/1不一样，那个是退出码这个是判断的结果，程序的退出码是最后的那个process来决定的，也就是提示程序或者使用者是否全部成功，还是有不成功的链接。
   } catch (err) {
     // 超时、域名解析不了、连不上……都会落到这里，一律算 DOWN。
+    console.log(err.message);
+    console.log(err.cause);
     return false;
   }
 }

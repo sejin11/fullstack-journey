@@ -1,15 +1,15 @@
 #链接测试文本集合
 
-https://www.google.com
-https://www.baidu.com
-https://purehikegear.com
-https://purehikegear.cn
-https://www.youtube.com
+www.google.com
+www.baidu.com
+purehikegear.com
+purehikegear.cn
+www.youtube.com
 a.b
 b.c
-https://www.instgram.com
+www.instgram.com
 # 我的监控清单
 
 https://example.com
-https://baidu.com
-https://this-site-does-not-exist-abc.invalid
+baidu.com
+this-sihttps://te-does-not-exist-abc.invalid
