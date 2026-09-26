@@ -492,7 +492,7 @@ function analyzeResults(results) {
     const bad = results.filter(res => res.status === "down").length;
   }  catch(err) {
     throw new Error("不认识的状态")
-    console.log(err.massage);
+    console.log(err.message);
   }
   console.log(`{ok:${good}, down:${bad}}`);
 }
@@ -521,7 +521,7 @@ function analyzeResults(results) {
   for (const res of results) {
     if (res.status !=="ok" && res.status !=="down") {
       throw new Error(`不认识的状态:${res.status}(下标${index})`)
-      console.log(err.massage);
+      console.log(err.message);
     }
   index++;
   }
@@ -530,7 +530,7 @@ function analyzeResults(results) {
     const bad = results.filter(res => res.status === "down").length;
     console.log(`{ok:${good}, down:${bad}}`);
   }  catch(err) {
-    console.log(err.massage);
+    console.log(err.message);
   }
 }
 
@@ -579,7 +579,7 @@ function analyzeResults(results) {
     const bad = results.filter(res => res.status === "down").length;
     return {ok:good, down:bad};
   }  catch(err) {
-    console.log(err.massage);
+    console.log(err.message);
   }
 }
 
@@ -595,3 +595,164 @@ console.log(analyzeResults(results));
 2.等待清单上的结果，没有就只能得到一个promise清单
 3.fetch不能自动补全协议头
 4.变量在花括号内的传不出去。报错发现的。
+
+|--|--|--|--|--|--|
+FS-101笔记
+
+先修改之前的一些不足
+1.把错误信息输出到标准输出改为输出到标准错误，然后再调用错误信息的message。原因改为打印特定的信息。
+2.函数前增加了export，然后把数据和执行函数注释掉了。还得改一下后缀。
+3.拼写基本都改了。使用了grep和sed
+
+正式的课程笔记
+前面三步看完之后增强了理解。
+第四步骤再/tmp目录下测试完
+第五步实战任务
+用例一：
+#!/usr/bin/env node 
+
+import { analyzeResults } from "./analyze-results.mjs";
+
+let failed = 0;
+
+function test(name, fn) {
+  try {
+    fn();
+    const okCount = fn();
+    console.log(`正确:${name}${okCount}个`);
+  } catch(err) {
+    failed++;
+    console.log(`这个错了:${name}`);
+    console.error(`原因是:${err.message}`);
+  }
+}
+
+test("OK的个数为:",() => {
+  const got = analyzeResults([{status:"ok"}, {status:"down"}, {status:"ok"}]);
+  return got.ok;
+  if (got.ok !==2) throw new Error(`期望是2，实际是${got.ok}`);
+});
+
+console.log(failed == 0 ? "全部通过检查" : `有${failed}个失败，请检查`);
+process.exit(failed === 0 ? 0 : 1);
+
+╭─  ~/projects/fullstack-journey   main !4 ?2                                        ─╮
+╰─❯ node scripts/analyze-results.test.mjs                                                ─╯
+正确:OK的个数为:2个
+全部通过检查
+
+用例二：
+#!/usr/bin/env node 
+
+import { analyzeResults } from "./analyze-results.mjs";
+
+let failed = 0;
+
+function test(name, fn) {
+  try {
+    fn();
+    const okCount = fn();
+    console.log(`正确:${name}${okCount}个`);
+  } catch(err) {
+    failed++;
+    console.log(`这个错了:${name}`);
+    console.error(`原因是:${err.message}`);
+  }
+}
+
+test("OK的个数为:",() => {
+  const got = analyzeResults([]);
+  //const got = analyzeResults([{status:"ok"}, {status:"down"}, {status:"ok"}]);
+  return got.ok;
+  if (got.ok !==0) throw new Error(`期望是0，实际是${got.ok}`);
+  //if (got.ok !==2) throw new Error(`期望是1，实际是${got.ok}`);
+});
+
+console.log(failed == 0 ? "全部通过检查" : `有${failed}个失败，请检查`);
+process.exit(failed === 0 ? 0 : 1);
+
+╭─  ~/projects/fullstack-journey   main !4 ?2                                        ─╮
+╰─❯ node scripts/analyze-results.test.mjs                                                ─╯
+正确:OK的个数为:0个
+全部通过检查
+
+用例三:
+#!/usr/bin/env node 
+
+import { analyzeResults } from "./analyze-results.mjs";
+
+let failed = 0;
+
+function test(name, fn) {
+  try {
+    fn();
+    const okCount = fn();
+    console.log(`正确:${name}${okCount}个`);
+  } catch(err) {
+    failed++;
+    console.log(`这个错了:${name}`);
+    console.error(`原因是:${err.message}`);
+  }
+}
+
+test("OK的个数为:",() => {
+  const got = analyzeResults([{status:"ok"}, {status:"down"},{status:"这是一个未知的值"}]);
+  //const got = analyzeResults([]);
+  //const got = analyzeResults([{status:"ok"}, {status:"down"}, {status:"ok"}]);
+  return got.ok;
+  if (got.ok !==1) throw new Error(`期望是1，实际是${got.ok}`);
+  //if (got.ok !==0) throw new Error(`期望是0，实际是${got.ok}`);
+  //if (got.ok !==2) throw new Error(`期望是2，实际是${got.ok}`);
+});
+
+console.log(failed == 0 ? "全部通过检查" : `有${failed}个失败，请检查`);
+process.exit(failed === 0 ? 0 : 1);
+
+╭─  ~/projects/fullstack-journey   main !4 ?2                                        ─╮
+╰─❯ node scripts/analyze-results.test.mjs                                                ─╯
+这个错了:OK的个数为:
+原因是:不认识的状态:这是一个未知的值(下标2)
+有1个失败，请检查
+
+到这里其实我想到一个点，这个name的parameter设置成现在这个不是很合适，因为在出错的时候显示不够清晰，还是该改为一个名称更合适一些，现在就不改了先这样，无伤大雅。
+顺利走到错误的部分，导入函数和实际运行的test均给出错误信息。
+
+用例四:
+#!/usr/bin/env node 
+
+import { analyzeResults } from "./analyze-results.mjs";
+
+let failed = 0;
+
+function test(name, fn) {
+  try {
+    fn();
+    const okCount = fn();
+    console.log(`正确:${name}${okCount}个`);
+  } catch(err) {
+    failed++;
+    console.log(`这个错了:${name}`);
+    console.error(`原因是:${err.message}`);
+  }
+}
+
+test("OK的个数为:",() => {
+  const got = analyzeResults([{status:"down"}, {status:"down"}]);
+  //const got = analyzeResults([{status:"ok"}, {status:"down"},{status:"这是一个未知的值"}]);
+  //const got = analyzeResults([]);
+  //const got = analyzeResults([{status:"ok"}, {status:"down"}, {status:"ok"}]);
+  return got.ok;
+  if (got.ok !==0) throw new Error(`期望是0，实际是${got.ok}`);
+  //if (got.ok !==0) throw new Error(`期望是0，实际是${got.ok}`);
+  //if (got.ok !==2) throw new Error(`期望是2，实际是${got.ok}`);
+});
+
+console.log(failed == 0 ? "全部通过检查" : `有${failed}个失败，请检查`);
+process.exit(failed === 0 ? 0 : 1);
+
+╭─  ~/projects/fullstack-journey   main !4 ?2                                        ─╮
+╰─❯ node scripts/analyze-results.test.mjs                                                ─╯
+正确:OK的个数为:0个
+全部通过检查
+
+没有不认识的状态，但全部都是down的状态，程序也在正常运行，因为他不能决定链接的状态，所以他认为检查完了，是正常的。只不过这个数量都是0，也就是链接挂了的意思。我认为合理。

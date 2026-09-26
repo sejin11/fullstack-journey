@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-function analyzeResults(results) {
+export function analyzeResults(results) {
   let index = 0;
   for (const res of results) {
     if (res.status !=="ok" && res.status !=="down") {
@@ -13,12 +13,12 @@ function analyzeResults(results) {
     const bad = results.filter(res => res.status === "down").length;
     return {ok:good, down:bad};
   }  catch(err) {
-    console.log(err.massage);
+    console.error(err.cause?.code ?? err.message);
   }
 }
 
-const results = [
+/*const results = [
     {status:"ok"}, {status:"down"}, {status:"ok"}, {status:"ok"},
   ];
-
-console.log(analyzeResults(results));
+*/
+//console.log(analyzeResults(results));

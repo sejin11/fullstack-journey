@@ -20,7 +20,7 @@ try {
 } catch (err) {
   // 错误信息一律走 stderr（标准错误），免得混进正常输出里被当成结果。
   console.error(`错误：读不到文件 ${file}`);
-  console.error(`原因：${err.code}`);
+  console.error(`原因：${err.code ?? err.message}`);
   process.exit(2);
 }
 

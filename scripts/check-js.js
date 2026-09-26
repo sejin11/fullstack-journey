@@ -53,8 +53,7 @@ async function checkOne(url) {
     return res.status >= 200 && res.status < 400;  //如果是返回码早200到400之间，包括200，不包括400就是正常的，返回布尔值ture，其他的状态吗就是false。这个到bash的0/1不一样，那个是退出码这个是判断的结果，程序的退出码是最后的那个process来决定的，也就是提示程序或者使用者是否全部成功，还是有不成功的链接。
   } catch (err) {
     // 超时、域名解析不了、连不上……都会落到这里，一律算 DOWN。
-    console.log(err.message);
-    console.log(err.cause);
+    console.error(err.cause?.code ?? err.message);
     return false;
   }
 }
