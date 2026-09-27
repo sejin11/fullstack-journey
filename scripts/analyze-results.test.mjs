@@ -21,8 +21,8 @@ test("OK的个数为:",() => {
   //const got = analyzeResults([{status:"ok"}, {status:"down"},{status:"这是一个未知的值"}]);
   //const got = analyzeResults([]);
   //const got = analyzeResults([{status:"ok"}, {status:"down"}, {status:"ok"}]);
-  return got.ok;
   if (got.ok !==0) throw new Error(`期望是0，实际是${got.ok}`);
+  return got.ok;
   //if (got.ok !==0) throw new Error(`期望是0，实际是${got.ok}`);
   //if (got.ok !==2) throw new Error(`期望是2，实际是${got.ok}`);
 });
