@@ -26,8 +26,16 @@ test("空数组",() => {
 });
 
 test("不认识的状态情况",() => {
-  const got = analyzeResults([{status:"ok"}, {status:"down"},{status:"这是一个未知的值"}]);
-  if (got.ok !==0) throw new Error(`期望是0，实际是${got.ok}`);
+  let threw = false;
+  try {
+  analyzeResults([{status:"ok"}, {status:"down"},{status:"这是一个未知的值"}]);
+  } catch(err){
+    threw = true;
+    if(!err.message.includes("这是一个未知的值")) {
+      throw new Error(`错误信息没带上状态:${err.message}`)
+    }
+  }
+  if (!threw) throw new Error("没有抛错,应该抛错");
 });
 
 test("两个DOWN没有OK的情况",() => {

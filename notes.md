@@ -758,13 +758,45 @@ process.exit(failed === 0 ? 0 : 1);
 没有不认识的状态，但全部都是down的状态，程序也在正常运行，因为他不能决定链接的状态，所以他认为检查完了，是正常的。只不过这个数量都是0，也就是链接挂了的意思。我认为合理。
 
 ------------------------------------------------------
-FS010修改部分代码已经在文
-下面是输出
-╭─  ~/projects/fullstack-journey   main !1                                           ─╮
+FS010修改部分代码已经在文档里，死代码已删除。
+修改后测试和故意改错部分内容的输出。
+全部通过：
 ╰─❯ node scripts/analyze-results.test.mjs                                                ─╯
 正确:两个OK一个DOWN的情况
 正确:空数组
-这个错了:不认识的状态情况
-原因是:不认识的状态:这是一个未知的值(下标2)
+正确:不认识的状态情况
 正确:两个DOWN没有OK的情况
-有1个失败，请检查
+全部通过检查
+
+╭─  ~/projects/fullstack-journey   main !3                                           ─╮
+╰─❯ echo $?                                                                              ─╯
+0
+
+故意改错一处：(在导入的函数里首先加里return{ok: 9999})
+╰─❯ node scripts/analyze-results.test.mjs                                                ─╯
+这个错了:两个OK一个DOWN的情况
+原因是:期望是2，实际是9999
+这个错了:空数组
+原因是:期望是0，实际是9999
+这个错了:不认识的状态情况
+原因是:没有抛错,应该抛错
+这个错了:两个DOWN没有OK的情况
+原因是:期望是0，实际是9999
+有4个失败，请检查
+
+╭─  ~/projects/fullstack-journey   main !3                                           ─╮
+╰─❯ echo $?                                                                              ─╯
+1
+
+改回来之后：
+╭─  ~/projects/fullstack-journey   main !3                                           ─╮
+╰─❯ node scripts/analyze-results.test.mjs                                                ─╯
+正确:两个OK一个DOWN的情况
+正确:空数组
+正确:不认识的状态情况
+正确:两个DOWN没有OK的情况
+全部通过检查
+
+╭─  ~/projects/fullstack-journey   main !3                                           ─╮
+╰─❯ echo $?                                                                              ─╯
+0

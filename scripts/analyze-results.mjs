@@ -8,17 +8,8 @@ export function analyzeResults(results) {
     }
   index++;
   }
-  try{
     const good = results.filter(res => res.status === "ok").length;
     const bad = results.filter(res => res.status === "down").length;
     return {ok:good, down:bad};
-  }  catch(err) {
-    console.error(err.cause?.code ?? err.message);
   }
-}
 
-/*const results = [
-    {status:"ok"}, {status:"down"}, {status:"ok"}, {status:"ok"},
-  ];
-*/
-//console.log(analyzeResults(results));
